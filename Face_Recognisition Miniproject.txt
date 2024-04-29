@@ -1,0 +1,47 @@
+import cv2
+# Initialize video capture from the default camera (index 0)
+stream = cv2.VideoCapture(0)
+
+# Load the pre-trained Haar cascade classifier for face detection
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Main loop for video processing
+while True:
+    # Read a frame from the video stream
+    ret, frame = stream.read()
+    
+    # Check if the frame is successfully read
+    if not ret:
+        print("Error: Unable to capture frame from the video stream")
+        break
+    
+    # Check if frame size is valid
+    if frame.shape[0] > 0 and frame.shape[1] > 0:
+        # Display the original video frame
+        cv2.imshow('Original Video', frame)
+        
+        # Convert frame to grayscale for face detection
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Detect faces in the grayscale frame
+        faces = face_cascade.detectMultiScale(gray, 1.4, 4)
+
+        # Process each detected face
+        for (x, y, w, h) in faces:
+            # Draw a rectangle around each detected face
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255,0,0), 2)
+
+        # Display the video frame with detected faces
+        cv2.imshow('Detected Faces', frame)
+
+        # Check for key press to exit the program
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    else:
+        # Print error message if frame size is invalid
+        print("Error: Invalid frame size")
+        break
+
+# Release the video stream and close OpenCV windows
+stream.release()
+cv2.destroyAllWindows()
